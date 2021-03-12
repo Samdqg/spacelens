@@ -14,7 +14,8 @@ import kotlinx.android.synthetic.main.product_item.view.*
 
 class ProductsAdapter(
     private val context: Context,
-    private val products: MutableList<Product>) : RecyclerView.Adapter<ProductsAdapter.ViewHolder>() {
+    private val products: MutableList<Product>,
+    private val productClickListener: ProductClickListener) : RecyclerView.Adapter<ProductsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -37,6 +38,9 @@ class ProductsAdapter(
             .into(holder.image)
 
         holder.price.text = context.getString(R.string.label_price, product.price.toString())
+        holder.itemView.setOnClickListener{
+            productClickListener.onClickProduct(product)
+        }
     }
 
     fun refresh(productList: List<Product>) {

@@ -1,5 +1,6 @@
 package com.example.spacelens.presentation.features.list
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -9,12 +10,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.spacelens.R
 import com.example.spacelens.domain.entities.Product
+import com.example.spacelens.presentation.features.detail.ProductDetailActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() , ProductClickListener{
 
     private lateinit var viewModel: ProductViewModel
     private lateinit var adapter: ProductsAdapter
+
+    companion object{
+        const val product_key = "product"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +49,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initUI() {
-        adapter = ProductsAdapter(this, ArrayList())
+        adapter = ProductsAdapter(this, ArrayList(), this)
         rvProducts.layoutManager = GridLayoutManager(this, 2)
         rvProducts.adapter = adapter
     }
@@ -63,5 +69,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun hideLoading(){
         pbLoading.visibility = View.GONE
+    }
+
+    override fun onClickProduct(product: Product) {
+        val intent = Intent(this, ProductDetailActivity::class.java)
+        intent.putExtra(product_key, product)
+        startActivity(intent)
     }
 }
