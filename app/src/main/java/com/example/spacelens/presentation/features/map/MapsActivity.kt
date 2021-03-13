@@ -1,19 +1,26 @@
 package com.example.spacelens.presentation.features.map
 
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.example.spacelens.R
-
+import com.example.spacelens.domain.entities.Product
+import com.example.spacelens.presentation.features.list.MainActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import java.net.URL
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
+    var product: Product? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +29,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        product = intent.getParcelableExtra(MainActivity.product_key)
     }
 
     /**
@@ -37,8 +46,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        val location = LatLng(product!!.location.latitude, product!!.location.longitude)
+        mMap.addMarker(MarkerOptions().position(location).title(product!!.title)
+            .icon(BitmapDescriptorFactory.fromBitmap(getImage())))
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
+
+        mMap.setOnMarkerClickListener {
+            finish()
+            true
+        }
+
+
+    }
+
+    private fun getImage(): Bitmap?{
+        var image: Bitmap? = null
+        val url = URL(product!!.attachment.url)
+        image = BitmapFactory.decodeStream(url.openConnection().getInputStream())
+        return Bitmap.createScaledBitmap(image, 150, 150, false)
     }
 }
